@@ -10,7 +10,7 @@ A JavaScript library to assist loading templates (e.g. handlebars) and data file
 
 When a route is defined and matches the href of a link, the library will can the passed in callback function of that route:
 
-```
+```javascript
 loaded.router.get("/", function(url) {
     alert("This is the homepage");
 });
@@ -20,7 +20,7 @@ The router can be used independently but the library's dispatch tool can be used
 
 Static pages (no data)
 
-```
+```javascript
 // only template is loaded and rendered
 loaded.router.get("/", function(url) {
     loaded.dispatch.loadTemplate('/templates/index/index.handlebars');
@@ -29,7 +29,7 @@ loaded.router.get("/", function(url) {
 
 Data pages
 
-```
+```javascript
 // template and data are automatically compiled and rendered to screen.
 loaded.router.get("/", function(url) {
     loaded.dispatch.loadTemplate('/templates/index/index.handlebars');
@@ -41,7 +41,7 @@ Groups
 
 Groups simply allow routes of the same resource to be grouped together.
 
-```
+```javascript
 loaded.router.group("/admin", function() {
 
     // match "/admin"
@@ -62,7 +62,7 @@ Layouts
 
 Routes can be grouped by their HTML layout. If the library detects a new route is a different layout from the previous one, it will reload the page to ensure the layout is updated.
 
-```
+```javascript
 loaded.router.layout("default", function() {
     loaded.router.get("/", function(url) {
         loaded.dispatch.loadTemplate('/templates/index/index.handlebars');
@@ -83,7 +83,7 @@ loaded.router.layout("admin_layout", function() {
 
 ## Configuration
 
-```
+```javascript
 loaded.dispatch.config({
     "templates_dir": "/templates",
     "data_format": "json",
