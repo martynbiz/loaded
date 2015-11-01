@@ -1,6 +1,10 @@
 # Loaded
 
-A JavaScript library to assist loading templates (e.g. handlebars) and data files (e.g. json) based on defined routes. Suite to websites that use shared templates too.
+A JavaScript library to assist loading templates (e.g. handlebars) and data files (e.g. json) based on defined routes. Suite to websites that use shared templates too. 
+
+Allows for graceful degredation when the same resource is used for the standard page loads (href) as for the data file. If the library should throw an error, it will fallback to the link default.
+
+Also, this library does not require that you put JavaScript specific data inside the HTML. All JavaScript defined for the loading and rendering of templates and data can be written entirely in the JavaScript. This is a much more decoupled approach.
 
 ## Installation
 
