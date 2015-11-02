@@ -34,10 +34,20 @@ loaded.router = (function(ajax) {
     * Loop through routes organised by layout, check each one
     * @param string url The url in question
     * @param string method The method of the reqeust (e.g. GET)
+    * @return object|undefined {value: stored_value/handler, params: route_params, layout: route_layout}
     */
     var _match = function(url, method) {
 
-        //set default
+        // if url is missing, or empty return undefined
+        if (!url) return undefined;
+
+        // strip trailing slash "/accounts/" -> "/accounts"
+        // url.replace(/\/+$/, "");
+        if(url != "/" && url.substr(-1) === "/") {
+            url = url.substr(0, url.length - 1);
+        }
+
+        // set defaults
         if (! method) method = "GET";
 
         // loop through each layout and call individually
@@ -70,6 +80,7 @@ loaded.router = (function(ajax) {
     * @param string layout The current config routes layout, to set in result
     * @param string pattern The pattern which may include group(s) (The routes in config (Internal use only))
     * @param object result The result object to pass through and set if matched
+    * @return object|undefined {value: stored_value/handler, params: route_params, layout: route_layout}
     */
     var _match_recursive = function(url, method, config, layout, pattern, result) {
 
@@ -108,7 +119,8 @@ loaded.router = (function(ajax) {
                 // this is the only time that
                 if(params) {
                     params.shift() // we don't need the string
-                    result = config[key];
+                    result = {};
+                    result.value = config[key]
                     result.params = params
                     result.layout = layout
                 }
