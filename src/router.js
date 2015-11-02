@@ -60,12 +60,13 @@ loaded.router = (function(ajax) {
             // routes
             if (result) {
 
-                // same layout? if not, fresh load
-                if (result.layout != _current_layout) {
-
-                    // layout has changed, return null so a fresh reload will happen
-                    return undefined;
-                }
+                // // same layout? if not, fresh load
+                // UPDATE do this in init, compare layout
+                // if (result.layout != _current_layout) {
+                //
+                //     // layout has changed, return null so a fresh reload will happen
+                //     return undefined;
+                // }
 
                 return result;
             }
@@ -232,6 +233,26 @@ loaded.router = (function(ajax) {
         _current_group = current_group; //restore
     }
 
+    /**
+    * Set the current url
+    * @param string current_layout New current layout
+    * @return void
+    */
+    var _getCurrentLayout = function(current_layout) {
+
+        return _current_layout;
+    }
+
+    /**
+    * Set the current url
+    * @param string current_layout New current layout
+    * @return void
+    */
+    var _setCurrentLayout = function(current_layout) {
+
+        _current_layout = current_layout;
+    }
+
 
     // return public properties and
     return _this = { // _this allows us to?
@@ -242,5 +263,7 @@ loaded.router = (function(ajax) {
         delete: _delete,
         layout: _layout,
         group: _group,
+        setCurrentLayout: _setCurrentLayout,
+        getCurrentLayout: _getCurrentLayout
     }
 })();

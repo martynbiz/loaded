@@ -118,7 +118,7 @@ QUnit.test( "Test GET '/articles/1' route", function( assert ) {
     result = loaded.router.match( "/articles/1", "GET" );
     assert.equal( result.value, "articles get", "Passed!" );
     assert.equal( result.params[0], "1", "Passed!" );
-    assert.equal( result.layout, "articles_layout", "Passed!" );
+    assert.equal( result.layout, "home_layout", "Passed!" );
 });
 
 QUnit.test( "Test GET '/catalog/1' route", function( assert ) {
@@ -126,4 +126,17 @@ QUnit.test( "Test GET '/catalog/1' route", function( assert ) {
     assert.equal( result.value, "catalog get", "Passed!" );
     assert.equal( result.params[0], "1", "Passed!" );
     assert.equal( result.layout, "catalog_layout", "Passed!" );
+});
+
+
+// ====================================
+// current layout getter/setter
+
+QUnit.test( "Test current layout getter/setter", function( assert ) {
+    new_current_layout = "new_layout";
+
+    loaded.router.setCurrentLayout(new_current_layout);
+    result = loaded.router.getCurrentLayout();
+
+    assert.equal( result, new_current_layout, "Passed!" );
 });
