@@ -1,10 +1,10 @@
 
-if(typeof martynbiz === "undefined") martynbiz = {};
+if(typeof loaded === "undefined") loaded = {};
 
 /**
  * Collection of helper utils
  */
-martynbiz.utils = (function() {
+loaded.utils = (function() {
 
 	/**
 	 * Extend an object e.g. utils.extend(default, options)

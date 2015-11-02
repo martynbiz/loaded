@@ -1,11 +1,11 @@
 
-if(typeof martynbiz === "undefined") martynbiz = {};
+if(typeof loaded === "undefined") loaded = {};
 
 /**
  * An instance for storing and retrieving data
  * External to ajax encase I wanna use it throughout the app
  */
-martynbiz.cache = (function() {
+loaded.cache = (function() {
 
 	/**
 	 * @var object The cache

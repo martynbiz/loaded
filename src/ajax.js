@@ -1,11 +1,11 @@
 
-if(typeof martynbiz === "undefined") martynbiz = {};
+if(typeof loaded === "undefined") loaded = {};
 
 /**
  * Ajax caller with built in caching (something jquery doesn't offer)
  * Dependencies: cache, utils
  */
-martynbiz.ajax = function() {
+loaded.ajax = function() {
 
 	/**
 	 * prepare the data depending on what dataType is (e.g. JSON)
@@ -28,7 +28,7 @@ martynbiz.ajax = function() {
 	var _fetch = function(options) {
 
  		// default options
- 		options = martynbiz.utils.extend({
+ 		options = loaded.utils.extend({
  			success: function() {},
  			cache: false,
  			method: "GET",

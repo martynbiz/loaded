@@ -1,5 +1,5 @@
 
-if(typeof martynbiz === "undefined") martynbiz = {};
+if(typeof loaded === "undefined") loaded = {};
 
 /**
  * This is a stand-alone router that can define routes, and return a value
@@ -13,7 +13,7 @@ if(typeof martynbiz === "undefined") martynbiz = {};
  * });
  *
  */
-martynbiz.router = (function(ajax) {
+loaded.router = (function(ajax) {
 
     /**
     * @var object Stored routes defined by get(), post(), etc

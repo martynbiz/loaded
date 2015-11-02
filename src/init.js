@@ -5,7 +5,7 @@
 (function() {
 
     // init will load the init function to run when html is rendered
-    martynbiz.dispatch.init( function(container) {
+    loaded.dispatch.init( function(container) {
 
         // set current layout TODO
 
@@ -17,7 +17,7 @@
             links[i].addEventListener("click", function(e) {
 
                 // if a route exists for this url, load the page with ajax
-                var handler = martynbiz.router.match( this.getAttribute("href"), "GET" );
+                var handler = loaded.router.match( this.getAttribute("href"), "GET" );
 
                 if(handler) {
 

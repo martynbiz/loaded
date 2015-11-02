@@ -1,5 +1,5 @@
 
-if(typeof martynbiz === "undefined") martynbiz = {};
+if(typeof loaded === "undefined") loaded = {};
 
 /**
  * Will load and render templates and data
@@ -7,13 +7,13 @@ if(typeof martynbiz === "undefined") martynbiz = {};
  *
  * Usage:
  *
- * martynbiz.dispatch.loadTemplate(templatePath); // ajax load, call render
- * martynbiz.dispatch.loadData(dataPath); // ajax load, call render
+ * loaded.dispatch.loadTemplate(templatePath); // ajax load, call render
+ * loaded.dispatch.loadData(dataPath); // ajax load, call render
  *
  * Dependencies: ajax, utils
  *
  */
-martynbiz.dispatch = (function() {
+loaded.dispatch = (function() {
 
     /**
      * Init the object by passing the handler when html is rendered to screen
@@ -162,7 +162,7 @@ martynbiz.dispatch = (function() {
      */
     var _setConfig = function (config) {
 
-        _config = martynbiz.utils.extend(_config, config);
+        _config = loaded.utils.extend(_config, config);
 
         return _config;
     };
