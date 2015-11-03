@@ -23,7 +23,7 @@ loaded.router = (function(ajax) {
     /**
      * @var string Used to store the current layout
      */
-    var _current_layout = "default"; // TODO set this onload
+    var _current_layout = null; // when null, layouts are disabled 
 
     /**
      * @var string Only really used as a store for when creating grouped routes
@@ -42,7 +42,6 @@ loaded.router = (function(ajax) {
         if (!url) return undefined;
 
         // strip trailing slash "/accounts/" -> "/accounts"
-        // url.replace(/\/+$/, "");
         if(url != "/" && url.substr(-1) === "/") {
             url = url.substr(0, url.length - 1);
         }
@@ -59,14 +58,6 @@ loaded.router = (function(ajax) {
             // if this layout found a result, return it. don't bother with the other
             // routes
             if (result) {
-
-                // // same layout? if not, fresh load
-                // UPDATE do this in init, compare layout
-                // if (result.layout != _current_layout) {
-                //
-                //     // layout has changed, return null so a fresh reload will happen
-                //     return undefined;
-                // }
 
                 return result;
             }
@@ -114,7 +105,8 @@ loaded.router = (function(ajax) {
                 }
 
                 // compare the pattern and the url
-                var re = new RegExp("^" + pattern + "$");
+                pattern = "^" + pattern + "$";
+                var re = new RegExp(pattern);
                 var params = re.exec(url);
 
                 // this is the only time that
@@ -253,6 +245,16 @@ loaded.router = (function(ajax) {
         _current_layout = current_layout;
     }
 
+    /**
+    * Set the current url
+    * @param string current_layout New current layout
+    * @return void
+    */
+    var _getRoutes = function() {
+
+        return _routes;
+    }
+
 
     // return public properties and
     return _this = { // _this allows us to?
@@ -264,6 +266,7 @@ loaded.router = (function(ajax) {
         layout: _layout,
         group: _group,
         setCurrentLayout: _setCurrentLayout,
-        getCurrentLayout: _getCurrentLayout
+        getCurrentLayout: _getCurrentLayout,
+        getRoutes: _getRoutes
     }
 })();
