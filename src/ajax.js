@@ -73,7 +73,7 @@ loaded.ajax = function() {
  	};
 
 	// return public properties and
-	return _this = {
+	return {
 		options: {},
 		fetch: _fetch,
 	}

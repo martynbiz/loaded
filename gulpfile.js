@@ -11,9 +11,7 @@ gulp.task('default', function() {
         "./src/ajax.js",
         "./src/dispatch.js",
         "./src/router.js",
-        "./src/utils.js",
-
-        //"./src/init.js"
+        "./src/utils.js"
     ];
 
     gulp.src(scripts)

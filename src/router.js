@@ -23,7 +23,7 @@ loaded.router = (function(ajax) {
     /**
      * @var string Used to store the current layout
      */
-    var _current_layout = null; // when null, layouts are disabled 
+    var _current_layout = null; // when null, layouts are disabled
 
     /**
      * @var string Only really used as a store for when creating grouped routes
@@ -257,7 +257,7 @@ loaded.router = (function(ajax) {
 
 
     // return public properties and
-    return _this = { // _this allows us to?
+    return {
         match: _match,
         get: _get,
         post: _post,
