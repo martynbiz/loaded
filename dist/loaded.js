@@ -143,20 +143,6 @@ if(typeof loaded === "undefined") loaded = {};
 loaded.dispatch = (function() {
 
     /**
-     * Init the object by passing the handler when html is rendered to screen
-     * @param function handler This will be run every time html is rendered
-     * @return void
-     */
-    var _init = function (handler) {
-
-        // set the callback when we re-render
-        _initLinks = handler;
-
-        // call it once with window as container
-        _initLinks(document);
-    };
-
-    /**
      * @var array Stores templates indexed by their url
      */
     var _templatesCache = {};
@@ -294,10 +280,35 @@ loaded.dispatch = (function() {
         return _config;
     };
 
+    /**
+     * Init the object by passing the handler when html is rendered to screen
+     * @param function handler This will be run every time html is rendered
+     * @return void
+     */
+    var _init = function (handler) {
+        console.log("loaded notice: init function not set")
+    };
+
+    /**
+     * Init the object by passing the handler when html is rendered to screen
+     * @param function handler This will be run every time html is rendered
+     * @return void
+     */
+    var _setInit = function (init) {
+
+        // set the callback when we re-render
+        _init = init;
+    };
+
     return {
         loadData: _loadData,
         loadTemplate: _loadTemplate,
-        init: _init,
+        init: function (container) {
+
+            // call the init function
+            _init(container);
+        },
+        setInit: _setInit,
         config: _setConfig
     }
 })();
@@ -598,63 +609,4 @@ loaded.utils = (function() {
 	return {
 		extend: _extend,
 	};
-})();
-
-/**
- * TODO tests, require
- */
-
-(function() {
-
-    // set the layout based on the pathname
-    var result = loaded.router.match( window.location.pathname, "GET" );
-
-    if (result)
-        loaded.router.setCurrentLayout(result.layout);
-
-    // init will load the init function to run when html is rendered
-    loaded.dispatch.init( function(container) {
-
-        // set all links on page
-        var links = container.getElementsByTagName("a");
-        for(var i=0; i<links.length; i++) {
-
-            // set link click event behaviour
-            links[i].addEventListener("click", function(e) {
-
-                var link = this;
-
-                // if a route exists for this url, load the page with ajax
-                var result = loaded.router.match( this.getAttribute("href"), "GET" );
-                var current_layout = loaded.router.getCurrentLayout();
-
-                var hasLayout = (result && result.layout != undefined);
-                var layoutChanged = (current_layout != null && result.layout != current_layout);
-                if (hasLayout && layoutChanged) {
-
-                    // return and let default <a> nature take it's course
-                    // if layout is not null, and changed
-                    return;
-
-                }
-
-                var isResultCallable = (result && typeof result.value === "function");
-                if (isResultCallable) {
-
-                    // call the result with, pass in the href
-                    result.value(link.href);
-
-                    // update the browser url bar
-                    history.pushState({}, '', link.href);
-
-                    // blur link
-                    link.blur();
-
-                    // stop a standard http request
-                    e.preventDefault();
-                }
-
-            }, false);
-        }
-    });
 })();

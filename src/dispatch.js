@@ -16,20 +16,6 @@ if(typeof loaded === "undefined") loaded = {};
 loaded.dispatch = (function() {
 
     /**
-     * Init the object by passing the handler when html is rendered to screen
-     * @param function handler This will be run every time html is rendered
-     * @return void
-     */
-    var _init = function (handler) {
-
-        // set the callback when we re-render
-        _initLinks = handler;
-
-        // call it once with window as container
-        _initLinks(document);
-    };
-
-    /**
      * @var array Stores templates indexed by their url
      */
     var _templatesCache = {};
@@ -167,10 +153,35 @@ loaded.dispatch = (function() {
         return _config;
     };
 
+    /**
+     * Init the object by passing the handler when html is rendered to screen
+     * @param function handler This will be run every time html is rendered
+     * @return void
+     */
+    var _init = function (handler) {
+        console.log("loaded notice: init function not set")
+    };
+
+    /**
+     * Init the object by passing the handler when html is rendered to screen
+     * @param function handler This will be run every time html is rendered
+     * @return void
+     */
+    var _setInit = function (init) {
+
+        // set the callback when we re-render
+        _init = init;
+    };
+
     return {
         loadData: _loadData,
         loadTemplate: _loadTemplate,
-        init: _init,
+        init: function (container) {
+
+            // call the init function
+            _init(container);
+        },
+        setInit: _setInit,
         config: _setConfig
     }
 })();

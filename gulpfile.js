@@ -13,7 +13,7 @@ gulp.task('default', function() {
         "./src/router.js",
         "./src/utils.js",
 
-        "./src/init.js"
+        //"./src/init.js"
     ];
 
     gulp.src(scripts)
