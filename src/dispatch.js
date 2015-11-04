@@ -131,7 +131,7 @@ loaded.dispatch = (function() {
         container.innerHTML = template(_data);
 
         // re-assign behaviour to links in new html
-        _initLinks( container );
+        _init( container );
     };
 
     /**

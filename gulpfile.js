@@ -5,13 +5,17 @@ var gulp = require('gulp'),
 
 gulp.task('default', function() {
 
-    // init comes last
+    // wrap scripts in amd-start/end 
     var scripts = [
+        "./src/amd-start.js",
+
         "./src/cache.js",
         "./src/ajax.js",
         "./src/dispatch.js",
         "./src/router.js",
-        "./src/utils.js"
+        "./src/utils.js",
+
+        "./src/amd-end.js"
     ];
 
     gulp.src(scripts)

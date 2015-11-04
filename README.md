@@ -103,6 +103,6 @@ loaded.dispatch.config({
 
 TODO
 
-* tests - router: methods, groups, layouts, ; dispatch:
-* require -
+* tests - dispatch, ajax, cache: mock ajax calls 
+* require - make each module of loaded, a require module :)
 * history
