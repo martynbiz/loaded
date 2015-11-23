@@ -23,8 +23,15 @@ loaded.router.get("/", function() {
 Matching a route
 
 ```javascript
-value = loaded.router.match("/", "GET");
-value(); // alert: Hello world
+result = loaded.router.match("/", "GET");
+result.value(); // alert: Hello world
+```
+
+```javascript
+result = loaded.router.match(link.href, "GET");
+
+if (result && result.value typeof "function")
+    result.value(); // callback for the route
 ```
 
 The router can be used independently but the library's dispatch tool can be used to load the templates and data:
@@ -104,4 +111,4 @@ loaded.dispatch.config({
 TODO
 
 * tests - dispatch, ajax, cache: mock ajax calls
-* history back button
+* history back button - handle query strings
