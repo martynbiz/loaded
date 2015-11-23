@@ -1,21 +1,18 @@
 var gulp = require('gulp'),
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify'),
+    wrap = require('gulp-wrap-amd'),
     watch = require('gulp-watch');
 
 gulp.task('default', function() {
 
-    // wrap scripts in amd-start/end 
+    // wrap scripts in amd-start/end
     var scripts = [
-        "./src/amd-start.js",
-
-        "./src/cache.js",
-        "./src/ajax.js",
+        // "./src/cache.js",
+        // "./src/ajax.js",
         "./src/dispatch.js",
         "./src/router.js",
         "./src/utils.js",
-
-        "./src/amd-end.js"
     ];
 
     gulp.src(scripts)
@@ -25,6 +22,17 @@ gulp.task('default', function() {
     gulp.src(scripts)
         .pipe(concat('loaded.min.js'))
         .pipe(uglify())
+        .pipe(gulp.dest('./dist'));
+
+    gulp.src(scripts)
+        .pipe(concat('loaded-amd.js'))
+        .pipe(wrap({
+            deps: ['handlebars', 'jquery'],          // dependency array
+            params: ['Handlebars', '$'],        // params for callback
+            exports: 'loaded',         // variable to return
+            // moduleRoot: 'templates/', // include a module name in the define() call, relative to moduleRoot
+            // modulePrefix: 'rocks/'  // optional, prefix of the module name. It depends on existance of `moduleRoot`
+        }))
         .pipe(gulp.dest('./dist'));
 });
 

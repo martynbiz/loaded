@@ -1,3 +1,5 @@
+define(["handlebars","jquery"],function(Handlebars,$){
+
 
 if(typeof loaded === "undefined") loaded = {};
 
@@ -483,3 +485,7 @@ loaded.utils = (function() {
 		extend: _extend,
 	};
 })();
+
+return loaded;
+
+});
