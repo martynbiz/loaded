@@ -103,6 +103,5 @@ loaded.dispatch.config({
 
 TODO
 
-* tests - dispatch, ajax, cache: mock ajax calls 
-* require - make each module of loaded, a require module :)
-* history
+* tests - dispatch, ajax, cache: mock ajax calls
+* history back button
