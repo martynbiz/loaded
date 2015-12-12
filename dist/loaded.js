@@ -40,7 +40,18 @@ loaded.dispatch = (function() {
      */
     var _dataReady = true;
 
-    var _pushStatePath = "";
+    /**
+     * @var object
+     */
+    var _config = {
+
+        // where the library can find templates rather than having to
+        // specify full path every time when defining routes
+        "templates_dir": "",
+
+        // this is the container that will take the rendered html
+        "container_id": "loaded-content"
+    };
 
     /**
      * Once the template has loaded, this will set the template and flag
@@ -121,48 +132,62 @@ loaded.dispatch = (function() {
      */
     var _render = function () {
 
+        // this only passes when we have both sets of data
         if (!_templateReady || !_dataReady) {
             return false;
         }
 
-        var template = Handlebars.compile(_template);
+        // render with out developer defined render function
+        _config.render(_template, _data);
 
-        var container = document.getElementById("content");
-        container.innerHTML = template(_data);
-
-        // re-assign behaviour to links in new html
-        _init( container );
-
-        // // render with out developer defined render function
-        // _config.render(_template, _data);
+        // init new html
+        loaded.dispatch.init( _getContainer() );
     };
 
     /**
-     * @var object
-     */
-    var _config = {
-        'templates_dir': ''
-    };
-
-    /**
-     * Get set config
+     * Set config
      * @param object config New config to merge
      * @return object new config
      */
-    var _setConfig = function (config) {
+    var _setConfig = function (config, value) {
 
-        _config = loaded.utils.extend(_config, config);
+        // determine if we're merging a passed in object, or
+        // a single name/value
+        if (typeof config == "string") {
+            _config[config] = value;
+        } else {
+            _config = loaded.utils.extend(_config, config);
+        }
 
         return _config;
     };
 
     /**
-     * Init the object by passing the handler when html is rendered to screen
-     * @param function handler This will be run every time html is rendered
-     * @return void
+     * Get config
+     * @param object config New config to merge
+     * @return object new config
      */
-    var _init = function (handler) {
-        console.log("loaded notice: init function not set")
+    var _getConfig = function (name) {
+
+        return _config[name];
+    };
+
+    /**
+     * Get container element
+     * @return domElement
+     */
+    var _getContainer = function () {
+
+        return document.getElementById( _config["container_id"] );
+    };
+
+    /**
+     * Will set the innerHTML of the configured "container_id" element
+     * @param string content New html to set
+     */
+    var _setHTML = function (html) {
+
+        _getContainer().innerHTML = html;
     };
 
     /**
@@ -170,22 +195,102 @@ loaded.dispatch = (function() {
      * @param function handler This will be run every time html is rendered
      * @return void
      */
-    var _setInit = function (init) {
+    var _init = function(container) {
 
-        // set the callback when we re-render
-        _init = init;
+        // set container to document by default
+        container = container || document;
+
+        // set all links on page
+        var links = container.getElementsByTagName("a");
+        for(var i=0; i<links.length; i++) {
+
+            // set link click event behaviour
+            links[i].addEventListener("click", function(e) {
+
+                var link = this;
+
+                // if a route exists for this url, load the page with ajax
+                var result = loaded.router.match( this.getAttribute("href"), "GET" );
+                var current_layout = loaded.router.getCurrentLayout();
+
+                // TODO why did we remove this from dispatch?
+                var hasLayout = (result && result.layout != undefined);
+                var layoutChanged = (current_layout != null && result.layout != current_layout);
+                if (hasLayout && layoutChanged) {
+
+                    // return and let default <a> nature take it's course
+                    // if layout is not null, and changed
+                    return;
+
+                }
+
+                var isResultCallable = (result && typeof result.value === "function");
+                if (isResultCallable) {
+
+                    // call the result with, pass in the href
+                    // this will load the template and data
+                    result.value(link.href);
+
+                    // update the browser url bar
+                    history.pushState({}, '', link.href);
+
+                    // blur link
+                    link.blur();
+
+                    // stop a standard http request
+                    e.preventDefault();
+                }
+
+            }, false);
+        }
+
+        // set the layout based on the pathname
+        var result = loaded.router.match( window.location.pathname, "GET" );
+
+        // set the layout of this route. the dispatch(?) will determine whether we
+        // need to reload the page if the layout changes
+        if (result)
+            loaded.router.setCurrentLayout( result.layout );
+
+        // set event listener for push state changed
+        // this will fire when the back button is pressed, we will loaded the
+        // new page based on the updated current pathname
+        window.addEventListener('popstate', function(event) {
+
+            // this is somewhat similar to our code above but some differences
+            // such as we need to fetch the result based on pathname, not href.
+            // perhaps someway to DRY them both out a little?
+
+            // if a route exists for this url, load the page with ajax
+            var result = loaded.router.match( window.location.pathname, "GET" );
+            var current_layout = loaded.router.getCurrentLayout();
+
+            var hasLayout = (result && result.layout != undefined);
+            var layoutChanged = (current_layout != null && result.layout != current_layout);
+            if (hasLayout && layoutChanged) {
+
+                // just reload
+                window.location.href = window.location.pathname;
+            }
+
+            var isResultCallable = (result && typeof result.value === "function");
+            if (isResultCallable) {
+
+                // call the result with, pass in the href
+                // this will load the template and data
+                // TODO how to handle GETs
+                result.value(window.location.pathname);
+            }
+        });
     };
 
     return {
         loadData: _loadData,
         loadTemplate: _loadTemplate,
-        init: function (container) {
-
-            // call the init function
-            _init(container);
-        },
-        setInit: _setInit,
-        config: _setConfig
+        getConfig: _getConfig,
+        setConfig: _setConfig,
+        setHTML: _setHTML,
+        init: _init,
     }
 })();
 

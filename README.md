@@ -110,6 +110,8 @@ loaded.dispatch.config({
 
 TODO
 
-* docs for http 
-* tests - dispatch, ajax, cache: mock ajax calls
+* stop using jquery.ajax, remove _templatesCache stuff
+* docs for http, update all docs
+* tests - more dispatch
+* better xhr mock library
 * history back button - handle query strings
