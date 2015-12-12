@@ -110,5 +110,6 @@ loaded.dispatch.config({
 
 TODO
 
+* docs for http 
 * tests - dispatch, ajax, cache: mock ajax calls
 * history back button - handle query strings

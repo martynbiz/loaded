@@ -5,7 +5,7 @@ if(typeof loaded === "undefined") loaded = {};
  * Ajax caller with built in caching (something jquery doesn't offer)
  * Dependencies: cache, utils
  */
-loaded.ajax = function() {
+loaded.http = function() {
 
 	/**
 	 * prepare the data depending on what dataType is (e.g. JSON)
@@ -25,20 +25,20 @@ loaded.ajax = function() {
 	/**
 	 * Fetch data from the server
 	 */
-	var _fetch = function(options) {
+	var _send = function(options) {
 
  		// default options
  		options = loaded.utils.extend({
  			success: function() {},
- 			cache: false,
+ 			get_cached: false,
  			method: "GET",
- 			dataType: "text",
+ 			data_type: "text",
  			data: null
  		}, options);
 
  		// check cache
- 		if(options.cache && _Cache.get(options.url)) {
- 			options.success(_prepareData(_Cache.get(options.url), options.dataType), options.dataType);
+ 		if(options.get_cached && loaded.cache.get(options.url)) {
+ 			options.success(_prepareData(loaded.cache.get(options.url), options.data_type), options.data_type);
  			return true;
  		}
 
@@ -51,8 +51,8 @@ loaded.ajax = function() {
  	  }
  		xmlhttp.onreadystatechange = function() {
  			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
- 				_Cache.insert(options.url, xmlhttp.responseText, options.dataType);
- 				options.success(_prepareData(xmlhttp.responseText, options.dataType));
+ 				loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
+ 				options.success(_prepareData(xmlhttp.responseText, options.data_type));
  			}
  		}
  		xmlhttp.open(options.method.toUpperCase(), options.url, true);
@@ -75,7 +75,7 @@ loaded.ajax = function() {
 	// return public properties and
 	return {
 		options: {},
-		fetch: _fetch,
+		send: _send,
 	}
 
 }();

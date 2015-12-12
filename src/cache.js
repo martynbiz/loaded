@@ -14,6 +14,8 @@ loaded.cache = (function() {
 
 	/**
 	 * Get a cached item
+	 * @param string key The key to set in the cache
+	 * @return mixed
 	 */
 	var _get = function(key) {
  		return _cache[key];
@@ -21,24 +23,24 @@ loaded.cache = (function() {
 
 	/**
 	 * Set a cache item
-	 * @param mixed key The key to set in the cache
+	 * @param string key The key to set in the cache
 	 * @param mixed value The cached item
 	 */
-	var _insert = function(url, data) {
+	var _set = function(url, data) {
 		_cache[url] = data;
 	};
 
 	/**
 	 * Clean (empty) the cache
+	 * @return void
 	 */
-	var _clean = function() {
+	var _flush = function() {
  	  _cache = {};
- 	  return _cache
 	};
 
 	return {
 		get: _get,
-		insert: _insert,
-		clean: _clean
+		set: _set,
+		flush: _flush
 	};
 })();

@@ -134,6 +134,9 @@ loaded.dispatch = (function() {
 
         // re-assign behaviour to links in new html
         _init( container );
+
+        // // render with out developer defined render function
+        // _config.render(_template, _data);
     };
 
     /**
