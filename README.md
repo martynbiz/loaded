@@ -10,17 +10,23 @@ Also, this library does not require that you put JavaScript specific data inside
 
 Include the loaded library to your HTML:
 
+```html
 <script src="loaded.js">
+```
 
 Or the minified version:
 
+```html
 <script src="loaded.min.js">
+```
 
 ### AMD Module
 
 Loaded can also be loaded as an AMD module for use in Requirejs:
 
+```html
 <script src="loaded-amd.js">
+```
 
 ## Quick start
 
