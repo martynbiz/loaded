@@ -15,9 +15,9 @@ loaded.http = function() {
 	 */
 	var _prepareData = function (data, dataType) {
 		switch(dataType.toUpperCase()) {
-		  case "JSON":
-		    data = JSON.parse(data);
-		    break;
+			case "JSON":
+				data = JSON.parse(data);
+				break;
 		}
 		return data;
 	};
@@ -45,17 +45,24 @@ loaded.http = function() {
  		// make ajax call
  		var xmlhttp;
  		if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
- 		  xmlhttp = new XMLHttpRequest();
- 		} else {// code for IE6, IE5
- 		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
- 	  }
+			xmlhttp = new XMLHttpRequest();
+		} else {// code for IE6, IE5
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+
  		xmlhttp.onreadystatechange = function() {
  			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
  				loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
  				options.success(_prepareData(xmlhttp.responseText, options.data_type));
  			}
  		}
- 		xmlhttp.open(options.method.toUpperCase(), options.url, true);
+
+		// Set header so the called script knows that it's an XMLHttpRequest
+		xmlhttp.open(options.method.toUpperCase(), options.url, true);
+
+		// this is required so that the server-side scripts know if is an ajax request
+		xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+		
  		if(options.method.toUpperCase() === 'POST') {
  			xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
  			var data = function(data) {

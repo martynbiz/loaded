@@ -4,6 +4,142 @@ define(["handlebars","jquery"],function(Handlebars,$){
 if(typeof loaded === "undefined") loaded = {};
 
 /**
+ * An instance for storing and retrieving data
+ * External to ajax encase I wanna use it throughout the app
+ */
+loaded.cache = (function() {
+
+	/**
+	 * @var object The cache
+	 */
+	var _cache = {};
+
+	/**
+	 * Get a cached item
+	 * @param string key The key to set in the cache
+	 * @return mixed
+	 */
+	var _get = function(key) {
+ 		return _cache[key];
+ 	};
+
+	/**
+	 * Set a cache item
+	 * @param string key The key to set in the cache
+	 * @param mixed value The cached item
+	 */
+	var _set = function(url, data) {
+		_cache[url] = data;
+	};
+
+	/**
+	 * Clean (empty) the cache
+	 * @return void
+	 */
+	var _flush = function() {
+ 	  _cache = {};
+	};
+
+	return {
+		get: _get,
+		set: _set,
+		flush: _flush
+	};
+})();
+
+
+if(typeof loaded === "undefined") loaded = {};
+
+/**
+ * Ajax caller with built in caching (something jquery doesn't offer)
+ * Dependencies: cache, utils
+ */
+loaded.http = function() {
+
+	/**
+	 * prepare the data depending on what dataType is (e.g. JSON)
+	 * @param mixed data The data to convert to another type (e.g json)
+	 * @param string dataType e.g. "json"
+	 * @return mixed Prepared data
+	 */
+	var _prepareData = function (data, dataType) {
+		switch(dataType.toUpperCase()) {
+			case "JSON":
+				data = JSON.parse(data);
+				break;
+		}
+		return data;
+	};
+
+	/**
+	 * Fetch data from the server
+	 */
+	var _send = function(options) {
+
+ 		// default options
+ 		options = loaded.utils.extend({
+ 			success: function() {},
+ 			get_cached: false,
+ 			method: "GET",
+ 			data_type: "text",
+ 			data: null
+ 		}, options);
+
+ 		// check cache
+ 		if(options.get_cached && loaded.cache.get(options.url)) {
+ 			options.success(_prepareData(loaded.cache.get(options.url), options.data_type), options.data_type);
+ 			return true;
+ 		}
+
+ 		// make ajax call
+ 		var xmlhttp;
+ 		if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+			xmlhttp = new XMLHttpRequest();
+		} else {// code for IE6, IE5
+			xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+
+ 		xmlhttp.onreadystatechange = function() {
+ 			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+ 				loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
+ 				options.success(_prepareData(xmlhttp.responseText, options.data_type));
+ 			}
+ 		}
+
+		// Set header so the called script knows that it's an XMLHttpRequest
+		xmlhttp.open(options.method.toUpperCase(), options.url, true);
+
+		// this is required so that the server-side scripts know if is an ajax request
+		xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+		
+ 		if(options.method.toUpperCase() === 'POST') {
+ 			xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+ 			var data = function(data) {
+ 				var pairs = [];
+ 				for(var name in data) {
+ 					pairs.push(name+"="+data[name]);
+ 				}
+ 				return pairs.join("&");
+ 			}(options.data);
+ 			xmlhttp.send(data);
+ 		} else {
+ 			xmlhttp.send();
+ 		}
+
+ 	};
+
+	// return public properties and
+	return {
+		options: {},
+		send: _send,
+	}
+
+}();
+
+
+if(typeof loaded === "undefined") loaded = {};
+
+/**
  * Will load and render templates and data
  * Should be initiated with a handler for when html is rerendered
  *
@@ -49,10 +185,14 @@ loaded.dispatch = (function() {
 
         // where the library can find templates rather than having to
         // specify full path every time when defining routes
-        "templates_dir": "",
+        "templates_dir": "/templates",
 
         // this is the container that will take the rendered html
-        "container_id": "loaded-content"
+        "container_id": "loaded-content",
+
+        // debug mode allows us to switch of link default behaviour so we
+        // can view js error messages before the page reloads
+        "debug_mode": false
     };
 
     /**
@@ -77,7 +217,12 @@ loaded.dispatch = (function() {
      * Will load the template
      * @param string templatePath The path to the template file
      */
-    _loadTemplate = function(templatePath) {
+    _loadTemplate = function(templatePath, options) {
+
+        // set default options
+        options = loaded.utils.extend({
+            get_cached: true
+        }, options);
 
         // attach templates_dir
         templatePath = _config['templates_dir'] + templatePath;
@@ -93,13 +238,14 @@ loaded.dispatch = (function() {
             _template = null;
             _templateReady = false;
 
-            $.ajax({
+            loaded.http.send({
                 url: templatePath,
-                method: "GET"
-            }).done(function (html) {
-                _templatesCache[templatePath] = html;
-                _setTemplate(html);
-                _render();
+                method: "GET",
+                get_cached: options.get_cached,
+                success: function (html) {
+                    _setTemplate(html);
+                    _render();
+                }
             });
         }
     }
@@ -108,7 +254,12 @@ loaded.dispatch = (function() {
      * Will load the data for the template
      * @param string dataPath The path to the resource (e.g. /accounts/1)
      */
-    function _loadData(dataPath) {
+    function _loadData(dataPath, options) {
+
+        // set default options
+        options = loaded.utils.extend({
+            get_cached: false
+        }, options);
 
         // load the data
         if (dataPath) {
@@ -116,13 +267,15 @@ loaded.dispatch = (function() {
             _data = null;
             _dataReady = false;
 
-            $.ajax({
+            loaded.http.send({
                 url: dataPath,
                 method: "GET",
-                dataType: "json"
-            }).done(function (data) {
-                _setData(data);
-                _render();
+                data_type: "json",
+                get_cached: options.get_cached,
+                success: function (data) {
+                    _setData(data);
+                    _render();
+                }
             });
         }
     }
@@ -199,6 +352,10 @@ loaded.dispatch = (function() {
      */
     var _init = function(container) {
 
+        if ( _getConfig("debug_mode") == true ) {
+            console.log("Loaded: Debug mode is ON");
+        }
+
         // set container to document by default
         container = container || document;
 
@@ -209,13 +366,18 @@ loaded.dispatch = (function() {
             // set link click event behaviour
             links[i].addEventListener("click", function(e) {
 
+                // debug mode allows us to see what is breaking the js without
+                // the default brower behaviour loosing the js error in console
+                if ( _getConfig("debug_mode") == true ) {
+                    e.preventDefault();
+                }
+
                 var link = this;
 
                 // if a route exists for this url, load the page with ajax
                 var result = loaded.router.match( this.getAttribute("href"), "GET" );
                 var current_layout = loaded.router.getCurrentLayout();
 
-                // TODO why did we remove this from dispatch?
                 var hasLayout = (result && result.layout != undefined);
                 var layoutChanged = (current_layout != null && result.layout != current_layout);
                 if (hasLayout && layoutChanged) {

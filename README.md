@@ -10,31 +10,90 @@ Also, this library does not require that you put JavaScript specific data inside
 
 ...
 
-## Routing & Dispatch
+## Quick start
 
-When a route is defined and matches the href of a link, the library will can the passed in callback function of that route:
+To use loaded, all that is required is to define a few routes, and initiate the library.
+
+In the HTML, there should be a container element that we'll set our rendered HTML(e.g.
+template + data):
+
+```html
+<html>
+<head>
+</head>
+<body>
+  <div id="loaded-content"></div>
+</body>
+</html>
+```
+
+Next, we define all the routes that Loaded will load by Ajax requests:
+
+```javascript
+loaded.router.get("/", function() {
+
+    // GET /templates/index/index.handlebars
+    loaded.dispatch.loadTemplate('/index/index.handlebars');
+});
+
+loaded.router.get("/products", function(href) {
+
+    // GET /templates/products/index.handlebars
+    loaded.dispatch.loadTemplate('/products/index.handlebars');
+
+    // GET #href
+    loaded.dispatch.loadData(href);
+});
+```
+
+Then, we set the render function which is called when the template and data is ready:
+
+```javascript
+loaded.dispatch.setConfig({
+    "render": function(template, data) {
+        var render = Handlebars.compile(template);
+        loaded.dispatch.setHTML( render(data) )
+    }
+});
+```
+
+Lastly, we run the init function to initiate links etc now that configuration is setup:
+
+```javascript
+loaded.dispatch.init();
+```
+
+And that's pretty much all that is required. Ofcourse in your app you'll probably will
+have many more routes defined.
+
+## Components ##
+
+The next few sections discuss the components in more detail:
+
+### Routing & Dispatch
+
+Routes are defined with a callback:
 
 ```javascript
 loaded.router.get("/", function() {
     alert("Hello world");
 });
-```
 
-Matching a route
-
-```javascript
 result = loaded.router.match("/", "GET");
 result.value(); // alert: Hello world
 ```
 
 ```javascript
+
+// link <a href="..."
 result = loaded.router.match(link.href, "GET");
 
 if (result && result.value typeof "function")
     result.value(); // callback for the route
 ```
 
-The router can be used independently but the library's dispatch tool can be used to load the templates and data:
+The router can be used independently but the library's dispatch tool can also be
+used with the router to load somes templates and data:
 
 Static pages (no data)
 
@@ -99,19 +158,62 @@ loaded.router.layout("admin_layout", function() {
 });
 ```
 
+## HTTP
+
+The HTTP module makes AJAX requests to the server. It has no dependencies (e.g. jQuery) and
+also permits caching which is handle for template files (no need to keep fetching the same
+static template files)
+
+```javascript
+loaded.http.send({
+    url: "/path/to/resource",
+    method: "GET",
+    get_cached: true,
+    success: function (html) {
+        // do something
+    }
+});
+```
+
+## Cache
+
+Loaded also has it's own cache module which can be re-used for any purpose
+
+```javascript
+loaded.cache.set("mykey", "myvalue");
+var cached = loaded.cache.get("mykey"); // myvalue
+```
+
+Setting a time limit (ms) on cached items (TODO)
+
+```javascript
+loaded.cache.set("mykey", "myvalue", 3000);
+```
+
+
 ## Configuration
 
 ```javascript
 loaded.dispatch.config({
+
+    // where the library can find templates rather than having to
+    // specify full path every time when defining routes
     "templates_dir": "/templates",
-    "data_format": "json",
+
+    // this is the container that will take the rendered html
+    "container_id": "loaded-content",
+
+    // debug mode allows us to switch of link default behaviour so we
+    // can view js error messages before the page reloads
+    "debug_mode": false
 });
 ```
 
 TODO
 
-* stop using jquery.ajax, remove _templatesCache stuff
 * docs for http, update all docs
 * tests - more dispatch
 * better xhr mock library
 * history back button - handle query strings
+* put a time limit on cache
+* timelimit on cached items

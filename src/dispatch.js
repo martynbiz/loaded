@@ -47,10 +47,14 @@ loaded.dispatch = (function() {
 
         // where the library can find templates rather than having to
         // specify full path every time when defining routes
-        "templates_dir": "",
+        "templates_dir": "/templates",
 
         // this is the container that will take the rendered html
-        "container_id": "loaded-content"
+        "container_id": "loaded-content",
+
+        // debug mode allows us to switch of link default behaviour so we
+        // can view js error messages before the page reloads
+        "debug_mode": false
     };
 
     /**
@@ -75,7 +79,12 @@ loaded.dispatch = (function() {
      * Will load the template
      * @param string templatePath The path to the template file
      */
-    _loadTemplate = function(templatePath) {
+    _loadTemplate = function(templatePath, options) {
+
+        // set default options
+        options = loaded.utils.extend({
+            get_cached: true
+        }, options);
 
         // attach templates_dir
         templatePath = _config['templates_dir'] + templatePath;
@@ -91,13 +100,14 @@ loaded.dispatch = (function() {
             _template = null;
             _templateReady = false;
 
-            $.ajax({
+            loaded.http.send({
                 url: templatePath,
-                method: "GET"
-            }).done(function (html) {
-                _templatesCache[templatePath] = html;
-                _setTemplate(html);
-                _render();
+                method: "GET",
+                get_cached: options.get_cached,
+                success: function (html) {
+                    _setTemplate(html);
+                    _render();
+                }
             });
         }
     }
@@ -106,7 +116,12 @@ loaded.dispatch = (function() {
      * Will load the data for the template
      * @param string dataPath The path to the resource (e.g. /accounts/1)
      */
-    function _loadData(dataPath) {
+    function _loadData(dataPath, options) {
+
+        // set default options
+        options = loaded.utils.extend({
+            get_cached: false
+        }, options);
 
         // load the data
         if (dataPath) {
@@ -114,13 +129,15 @@ loaded.dispatch = (function() {
             _data = null;
             _dataReady = false;
 
-            $.ajax({
+            loaded.http.send({
                 url: dataPath,
                 method: "GET",
-                dataType: "json"
-            }).done(function (data) {
-                _setData(data);
-                _render();
+                data_type: "json",
+                get_cached: options.get_cached,
+                success: function (data) {
+                    _setData(data);
+                    _render();
+                }
             });
         }
     }
@@ -197,6 +214,10 @@ loaded.dispatch = (function() {
      */
     var _init = function(container) {
 
+        if ( _getConfig("debug_mode") == true ) {
+            console.log("Loaded: Debug mode is ON");
+        }
+
         // set container to document by default
         container = container || document;
 
@@ -207,13 +228,18 @@ loaded.dispatch = (function() {
             // set link click event behaviour
             links[i].addEventListener("click", function(e) {
 
+                // debug mode allows us to see what is breaking the js without
+                // the default brower behaviour loosing the js error in console
+                if ( _getConfig("debug_mode") == true ) {
+                    e.preventDefault();
+                }
+
                 var link = this;
 
                 // if a route exists for this url, load the page with ajax
                 var result = loaded.router.match( this.getAttribute("href"), "GET" );
                 var current_layout = loaded.router.getCurrentLayout();
 
-                // TODO why did we remove this from dispatch?
                 var hasLayout = (result && result.layout != undefined);
                 var layoutChanged = (current_layout != null && result.layout != current_layout);
                 if (hasLayout && layoutChanged) {

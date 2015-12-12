@@ -21,7 +21,7 @@
                 });
                 var stored = loaded.dispatch.getConfig("mykey");
 
-                assert.equal( "myvalue", stored );
+                assert.strictEqual( "myvalue", stored );
             });
 
             QUnit.test( "Dispatch: Test setConfig with name/value", function( assert ) {
@@ -29,14 +29,14 @@
                 loaded.dispatch.setConfig("mykey", "myvalue");
                 var stored = loaded.dispatch.getConfig("mykey");
 
-                assert.equal( "myvalue", stored );
+                assert.strictEqual( "myvalue", stored );
             });
 
-            QUnit.test( "Dispatch: container_id is 'content' by default", function( assert ) {
+            QUnit.test( "Dispatch: test default config values are set", function( assert ) {
 
-                var stored = loaded.dispatch.getConfig("container_id");
-
-                assert.equal( "loaded-content", stored );
+                assert.strictEqual( loaded.dispatch.getConfig("container_id"), "loaded-content" );
+                assert.strictEqual( loaded.dispatch.getConfig("templates_dir"), "/templates" );
+                assert.strictEqual( loaded.dispatch.getConfig("debug_mode"), false );
             });
 
         });

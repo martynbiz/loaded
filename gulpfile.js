@@ -8,8 +8,8 @@ gulp.task('default', function() {
 
     // wrap scripts in amd-start/end
     var scripts = [
-        // "./src/cache.js",
-        // "./src/ajax.js",
+        "./src/cache.js",
+        "./src/http.js",
         "./src/dispatch.js",
         "./src/router.js",
         "./src/utils.js",
