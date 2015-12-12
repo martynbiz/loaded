@@ -8,7 +8,19 @@ Also, this library does not require that you put JavaScript specific data inside
 
 ## Installation
 
-...
+Include the loaded library to your HTML:
+
+<script src="loaded.js">
+
+Or the minified version:
+
+<script src="loaded.min.js">
+
+### AMD Module
+
+Loaded can also be loaded as an AMD module for use in Requirejs:
+
+<script src="loaded-amd.js">
 
 ## Quick start
 
@@ -22,6 +34,11 @@ template + data):
 <head>
 </head>
 <body>
+  <h1>My loaded app</h1>
+  <ul>
+    <li><a href="/">Home</a>
+    <li><a href="/products">Products</a>
+  </ul>
   <div id="loaded-content"></div>
 </body>
 </html>
@@ -30,23 +47,18 @@ template + data):
 Next, we define all the routes that Loaded will load by Ajax requests:
 
 ```javascript
-loaded.router.get("/", function() {
-
-    // GET /templates/index/index.handlebars
+loaded.router.get("/", function(href) {
     loaded.dispatch.loadTemplate('/index/index.handlebars');
 });
 
 loaded.router.get("/products", function(href) {
-
-    // GET /templates/products/index.handlebars
     loaded.dispatch.loadTemplate('/products/index.handlebars');
-
-    // GET #href
-    loaded.dispatch.loadData(href);
+    loaded.dispatch.loadData(href); // GET /products
 });
 ```
 
-Then, we set the render function which is called when the template and data is ready:
+Then, we set the render function which is called when the template and data is ready.
+In the example below, we're using Handlebars templates to render HTML:
 
 ```javascript
 loaded.dispatch.setConfig({
@@ -158,6 +170,28 @@ loaded.router.layout("admin_layout", function() {
 });
 ```
 
+#### Configuration
+
+```javascript
+// name/value pair
+loaded.dispatch.setConfig("templates_dir", "/templates");
+
+// multiple configs
+loaded.dispatch.setConfig({
+
+    // where the library can find templates rather than having to
+    // specify full path every time when defining routes
+    "templates_dir": "/templates",
+
+    // this is the container that will take the rendered html
+    "container_id": "loaded-content",
+
+    // debug mode allows us to switch of link default behaviour so we
+    // can view js error messages before the page reloads
+    "debug_mode": false
+});
+```
+
 ## HTTP
 
 The HTTP module makes AJAX requests to the server. It has no dependencies (e.g. jQuery) and
@@ -190,24 +224,6 @@ Setting a time limit (ms) on cached items (TODO)
 loaded.cache.set("mykey", "myvalue", 3000);
 ```
 
-
-## Configuration
-
-```javascript
-loaded.dispatch.config({
-
-    // where the library can find templates rather than having to
-    // specify full path every time when defining routes
-    "templates_dir": "/templates",
-
-    // this is the container that will take the rendered html
-    "container_id": "loaded-content",
-
-    // debug mode allows us to switch of link default behaviour so we
-    // can view js error messages before the page reloads
-    "debug_mode": false
-});
-```
 
 TODO
 
