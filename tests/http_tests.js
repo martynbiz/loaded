@@ -1,7 +1,4 @@
-(function(loaded) {
-
-    // ====================================
-    // setup
+QUnit.module( "loaded.http", function(hooks) {
 
     // setup some constants as test data from the server
     // *_TEXT will not parse as json
@@ -17,6 +14,7 @@
     var expectedDataFromProvider = [];
 
     // MockHttpServer is used to mock the xmlhttprequest calls
+    // https://github.com/philikon/MockHttpRequest
     // TODO find another library that tests for the data passed to xhr
     var server = new MockHttpServer();
 
@@ -33,7 +31,7 @@
     // is not used for http requests
     server.start();
 
-    QUnit.test( "Http: Test send returns expected data", function( assert ) {
+    QUnit.test( "Test send returns expected data", function( assert ) {
 
         expectedDataFromProvider = [FIRST_CALL_TEXT];
 
@@ -47,7 +45,7 @@
 
     });
 
-    QUnit.test( "Http: Test send when get_cached is not set (default: false)", function( assert ) {
+    QUnit.test( "Test send when get_cached is not set (default: false)", function( assert ) {
 
         expectedDataFromProvider = [FIRST_CALL_TEXT, SECOND_CALL_TEXT];
 
@@ -66,7 +64,7 @@
         });
     });
 
-    QUnit.test( "Http: Test send when get_cached is true", function( assert ) {
+    QUnit.test( "Test send when get_cached is true", function( assert ) {
 
         expectedDataFromProvider = [FIRST_CALL_TEXT, SECOND_CALL_TEXT];
 
@@ -86,7 +84,7 @@
         });
     });
 
-    QUnit.test( "Http: Test send when data_type is 'json'", function( assert ) {
+    QUnit.test( "Test send when data_type is 'json'", function( assert ) {
 
         expectedDataFromProvider = [FIRST_CALL_TEXT];
 
@@ -99,4 +97,4 @@
         });
     });
 
-})(loaded);
+});

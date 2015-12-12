@@ -20,8 +20,6 @@ Or the minified version:
 <script src="loaded.min.js">
 ```
 
-### AMD Module
-
 Loaded can also be loaded as an AMD module for use in Requirejs:
 
 ```html

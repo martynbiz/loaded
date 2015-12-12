@@ -1,15 +1,9 @@
-(function(loaded) {
-
-    // ====================================
-    // setup
-
-
-
+QUnit.module( "loaded.utils", function(hooks) {
 
     // ====================================
     // tests
 
-    QUnit.test( "Utils: ", function( assert ) {
+    QUnit.test( "Test extends", function( assert ) {
         var actual = loaded.utils.extend({"option1": true}, {"option2": false});
         var expected = {"option1": true, "option2": false};
 
@@ -17,4 +11,4 @@
         assert.deepEqual( expected, actual );
     });
 
-})(loaded);
+});
