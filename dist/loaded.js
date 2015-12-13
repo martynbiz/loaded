@@ -76,7 +76,12 @@ loaded.http = function() {
 
  		// default options
  		options = loaded.utils.extend({
- 			success: function() {},
+ 			success: function() {
+				console.log("loaded.http: Success handler not defined");
+			},
+			error: function() {
+				console.log("loaded.http: Error handler not defined");
+			},
  			get_cached: false,
  			method: "GET",
  			data_type: "text",
@@ -99,9 +104,20 @@ loaded.http = function() {
 
  		xmlhttp.onreadystatechange = function() {
  			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
- 				loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
+
+				// store the cache for later, in the event that
+				// TODO use the cache flag, only store if passed
+				loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
+
+				// call the success method
  				options.success(_prepareData(xmlhttp.responseText, options.data_type));
- 			}
+
+ 			} else if (xmlhttp.readyState==4) { // error handler
+
+				// when an error occurs, we will call the developer defined error
+				// handler
+				options.error(_prepareData(xmlhttp.responseText, options.data_type));
+			}
  		}
 
 		// Set header so the called script knows that it's an XMLHttpRequest
@@ -109,7 +125,7 @@ loaded.http = function() {
 
 		// this is required so that the server-side scripts know if is an ajax request
 		xmlhttp.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-		
+
  		if(options.method.toUpperCase() === 'POST') {
  			xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
  			var data = function(data) {
@@ -190,7 +206,19 @@ loaded.dispatch = (function() {
 
         // debug mode allows us to switch of link default behaviour so we
         // can view js error messages before the page reloads
-        "debug_mode": false
+        "debug_mode": false,
+
+        // this is the render function to handle the template and data from the
+        // server
+        "render": function() {
+            console.log("loaded.dispatch: config.render function not defined");
+        },
+
+        // this is the render function to handle the template and data from the
+        // server
+        "error": function() {
+            console.log("loaded.dispatch: config.error_handler function not defined");
+        }
     };
 
     /**
@@ -200,6 +228,13 @@ loaded.dispatch = (function() {
     var _setTemplate = function (template) {
         _template = template;
         _templateReady = true;
+    };
+
+    /**
+     * Return the stored data
+     */
+    var _getData = function () {
+        return _data;
     };
 
     /**
@@ -256,7 +291,7 @@ loaded.dispatch = (function() {
 
         // set default options
         options = loaded.utils.extend({
-            get_cached: false
+            get_cached: false,
         }, options);
 
         // load the data
@@ -273,6 +308,9 @@ loaded.dispatch = (function() {
                 success: function (data) {
                     _setData(data);
                     _render();
+                },
+                error: function(data) {
+                    _config.error(data);
                 }
             });
         }
@@ -334,14 +372,14 @@ loaded.dispatch = (function() {
         return document.getElementById( _config["container_id"] );
     };
 
-    /**
-     * Will set the innerHTML of the configured "container_id" element
-     * @param string content New html to set
-     */
-    var _setHTML = function (html) {
-
-        _getContainer().innerHTML = html;
-    };
+    // /**
+    //  * Will set the innerHTML of the configured "container_id" element
+    //  * @param string content New html to set
+    //  */
+    // var _innerHTML = function (html) {
+    //
+    //     _getContainer().innerHTML = html;
+    // };
 
     /**
      * Init the object by passing the handler when html is rendered to screen
@@ -451,7 +489,9 @@ loaded.dispatch = (function() {
         loadTemplate: _loadTemplate,
         getConfig: _getConfig,
         setConfig: _setConfig,
-        setHTML: _setHTML,
+        getData: _getData,
+        setData: _setData,
+        getContainer: _getContainer,
         init: _init,
     }
 })();

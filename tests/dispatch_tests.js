@@ -1,5 +1,17 @@
 QUnit.module( "loaded.dispatch", function(hooks) {
 
+    // ====================================
+    // tests
+
+    QUnit.test( "Test setConfig with object", function( assert ) {
+
+        loaded.dispatch.setData("mydata");
+        var stored = loaded.dispatch.getData();
+
+        assert.equal( "mydata", stored );
+    });
+
+
     QUnit.module( "loaded.dispatch.setConfig", function(hooks) {
 
         // ====================================

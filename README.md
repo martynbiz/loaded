@@ -232,8 +232,10 @@ loaded.cache.set("mykey", "myvalue", 3000);
 TODO
 
 * docs for http, update all docs
-* tests - more dispatch
 * better xhr mock library
 * history back button - handle query strings
 * put a time limit on cache
 * timelimit on cached items
+* how to handle errors (e.g. 500)
+* only store cache if flag is passed, will take up LOTS of memory in big apps
+* tests - more dispatch, mock the environment? e.g. pathname - env.js
