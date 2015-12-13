@@ -57,6 +57,12 @@ if(typeof loaded === "undefined") loaded = {};
 loaded.http = function() {
 
 	/**
+	 * The last response
+	 * @var object
+	 */
+	var _lastResponse = {};
+
+	/**
 	 * prepare the data depending on what dataType is (e.g. JSON)
 	 * @param mixed data The data to convert to another type (e.g json)
 	 * @param string dataType e.g. "json"
@@ -69,6 +75,25 @@ loaded.http = function() {
 				break;
 		}
 		return data;
+	};
+
+	/**
+	 * Will return the last response object
+	 * @return object
+	 */
+	var _getLastResponse = function() {
+		return _lastResponse;
+	};
+
+	/**
+	 * Will return the last response object
+	 * @return object
+	 */
+	var _setLastResponse = function(xmlhttp, data) {
+		_lastResponse = {
+			status: xmlhttp.status,
+			data: data,
+		};
 	};
 
 	/**
@@ -105,22 +130,30 @@ loaded.http = function() {
 		}
 
  		xmlhttp.onreadystatechange = function() {
- 			if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+ 			if (xmlhttp.readyState==4) {
 
-				// store the cache for later, in the event that
-				// TODO use the cache flag, only store if passed
-				loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
+				var data = _prepareData(xmlhttp.responseText, options.data_type);
 
-				// call the success method
- 				options.success(_prepareData(xmlhttp.responseText, options.data_type));
+				// update the last response before the success handler
+				_setLastResponse(xmlhttp, data);
 
- 			} else if (xmlhttp.readyState==4) { // error handler
+				if (xmlhttp.status==200) {
 
-				// when an error occurs, we will call the developer defined error
-				// handler
-				options.error(_prepareData(xmlhttp.responseText, options.data_type));
-			}
- 		}
+					// store the cache for later, in the event that
+					// TODO use the cache flag, only store if passed
+					loaded.cache.set(options.url, xmlhttp.responseText, options.data_type);
+
+					// call the success method
+	 				options.success(data);
+
+				} else { // error handler
+
+					// when an error occurs, we will call the developer defined error
+					// handler
+					options.error(data);
+				}
+ 			}
+		}
 
 		// Set header so the called script knows that it's an XMLHttpRequest
 		xmlhttp.open(options.method.toUpperCase(), options.url, true);
@@ -148,6 +181,7 @@ loaded.http = function() {
 	return {
 		options: {},
 		send: _send,
+		getLastResponse: _getLastResponse
 	}
 
 }();
@@ -311,8 +345,9 @@ loaded.dispatch = (function() {
                     _setData(data);
                     _render();
                 },
-                error: function(data) {
-                    _config.error(data);
+                error: function() {
+                    var response = loaded.http.getLastResponse();
+                    _config.error(response);
                 }
             });
         }
@@ -408,6 +443,13 @@ loaded.dispatch = (function() {
                 // the default brower behaviour loosing the js error in console
                 if ( _getConfig("debug_mode") == true ) {
                     e.preventDefault();
+                }
+
+                // sometimes a link is present but not for navigation. an example
+                // of this is bootstrap dropdown. in most case, the href will be
+                // set to "#"
+                if (this.getAttribute("href") == "#") {
+                    return;
                 }
 
                 var link = this;

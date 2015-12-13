@@ -157,8 +157,9 @@ loaded.dispatch = (function() {
                     _setData(data);
                     _render();
                 },
-                error: function(data) {
-                    _config.error(data);
+                error: function() {
+                    var response = loaded.http.getLastResponse();
+                    _config.error(response);
                 }
             });
         }
@@ -254,6 +255,13 @@ loaded.dispatch = (function() {
                 // the default brower behaviour loosing the js error in console
                 if ( _getConfig("debug_mode") == true ) {
                     e.preventDefault();
+                }
+
+                // sometimes a link is present but not for navigation. an example
+                // of this is bootstrap dropdown. in most case, the href will be
+                // set to "#"
+                if (this.getAttribute("href") == "#") {
+                    return;
                 }
 
                 var link = this;

@@ -22,6 +22,13 @@ QUnit.module( "loaded.http", function(hooks) {
     var dataProvider = [];
     var statusCode = 200;
 
+    // setup some constants as test data from the server
+    // *_TEXT will not parse as json
+    var FIRST_CALL_TEXT = '"first call"', // no JSON parsing
+        SECOND_CALL_TEXT = '"second call"',
+        FIRST_CALL_JSON = 'first call', // after JSON parsing
+        SECOND_CALL_JSON = 'second call';
+
     // this is the handler for tests. set dataProvider in each test
     server.handle = function (request) {
         request.setResponseHeader("Content-Type", "application/robot");
@@ -34,13 +41,6 @@ QUnit.module( "loaded.http", function(hooks) {
         hooks.beforeEach( function() {
             statusCode = 200;
         } );
-
-        // setup some constants as test data from the server
-        // *_TEXT will not parse as json
-        var FIRST_CALL_TEXT = '"first call"', // no JSON parsing
-            SECOND_CALL_TEXT = '"second call"',
-            FIRST_CALL_JSON = 'first call', // after JSON parsing
-            SECOND_CALL_JSON = 'second call';
 
         // ====================================
         // tests
@@ -126,11 +126,39 @@ QUnit.module( "loaded.http", function(hooks) {
         QUnit.test( "Test send handles errors", function( assert ) {
 
             loaded.http.send({
-                success: function(actualData) {
+                success: function(data) {
                     assert.equal(1, 2, "Wrong handler called");
                 },
-                error: function(actualData) {
+                error: function(data) {
                     assert.equal(1, 1);
+                },
+                url: 'some_resource.php',
+            });
+
+        });
+
+        QUnit.test( "Test data is passed into error handler", function( assert ) {
+
+            dataProvider = [FIRST_CALL_TEXT];
+
+            loaded.http.send({
+                error: function(data) {
+                    assert.equal(data, FIRST_CALL_TEXT);
+                },
+                url: 'some_resource.php',
+            });
+
+        });
+
+        QUnit.test( "Test getLastResponse()", function( assert ) {
+
+            dataProvider = [FIRST_CALL_TEXT];
+
+            loaded.http.send({
+                error: function(data) {
+                    var response = loaded.http.getLastResponse();
+                    assert.equal(response.status, 500);
+                    assert.equal(response.data, FIRST_CALL_TEXT);
                 },
                 url: 'some_resource.php',
             });
