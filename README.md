@@ -1,6 +1,6 @@
 # Loaded
 
-A JavaScript library to assist loading templates (e.g. handlebars) and data files (e.g. json) based on defined routes. Suite to websites that use shared templates too.
+A JavaScript library to assist loading templates and data files asynchronously, and rendering them to the page. Ideally suited to apps that wish to use shared templates (e.g. same template files used for front and back end).
 
 Allows for graceful degradation when the same resource is used for the standard page loads (href) as for the data file. If the library should throw an error, it will fallback to the link default.
 
@@ -23,14 +23,18 @@ Or the minified version:
 Loaded can also be loaded as an AMD module for use in Requirejs:
 
 ```html
-<script src="loaded-amd.js">
+requirejs.config({
+    "paths": {
+      "loaded": "/js/loaded-amd.js"
+    }
+});
 ```
 
 ## Quick start
 
 To use loaded, all that is required is to define a few routes, and initiate the library.
 
-In the HTML, there should be a container element that we'll set our rendered HTML(e.g.
+In the HTML, there should be a container element that we'll set our rendered HTML (e.g.
 template + data):
 
 ```html
@@ -68,7 +72,7 @@ In the example below, we're using Handlebars templates to render HTML:
 loaded.dispatch.setConfig({
     "render": function(template, data) {
         var render = Handlebars.compile(template);
-        loaded.dispatch.setHTML( render(data) )
+        loaded.dispatch.getContainer().innerHTML = render(data);
     }
 });
 ```
@@ -192,23 +196,60 @@ loaded.dispatch.setConfig({
 
     // debug mode allows us to switch of link default behaviour so we
     // can view js error messages before the page reloads
-    "debug_mode": false
+    "debug_mode": false,
+    
+    // render function
+    "render": function(template, data) {
+      
+      // this implementation we are using Handlebars, remember to install Handlebars if so
+      var render = Handlebars.compile(template);
+      loaded.dispatch.getContainer().innerHTML = render(data);
+    },
+    
+    // error handler
+    "error": function(response) {
+      
+      // error handler triggered
+      // this implementation will load the error template and use the 
+      // data we received from the failed request (e.g. 401)
+      loaded.dispatch.loadTemplate('/templates/error/error.handlebars');
+      loaded.dispatch.setData(response.data); // data doesn't need loaded, just set
+    },
 });
 ```
 
 ## HTTP
 
 The HTTP module makes AJAX requests to the server. It has no dependencies (e.g. jQuery) and
-also permits caching which is handle for template files (no need to keep fetching the same
+also permits caching which is useful for template files (no need to keep fetching the same
 static template files)
 
 ```javascript
 loaded.http.send({
+    
+    // this is the URL of the resource we require
     url: "/path/to/resource",
+    
+    // the method 
     method: "GET",
-    get_cached: true,
-    success: function (html) {
+    
+    // data, perhaps required for POST requests
+    //data: {name: name, age: age}
+    
+    // this will load and store first time, then subsequent calls will retrieve it
+    cache: true,
+    
+    // what to do once the resource has been retrieved
+    success: function (data) {
         // do something
+        //..
+    }
+    
+    // what to do if the resource fails
+    success: function (data) {
+        // do something else
+        response = loaded.http.getLastResponse();
+        //..
     }
 });
 ```
